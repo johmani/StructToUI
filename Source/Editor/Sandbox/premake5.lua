@@ -10,6 +10,20 @@ project "Sandbox"
     Link.Runtime.Core()
     Link.Plugin.ImGui()
 
+    prebuildcommands {
+        RunHeaderTool(
+            "%{prj.location}"                      -- [Project Source Directory]
+            .. " %{prj.location}/Private/Meta.cpp" -- [Meta Output file]  
+            .. " Sandbox"                          -- [Namespace] 
+            .. " -I%{IncludeDir.Core}"             -- [Include]
+            .. " -I%{IncludeDir.glm}"
+            .. " -I%{IncludeDir.nvrhi}"
+            .. " -I%{IncludeDir.tracy}"
+            .. " -I%{IncludeDir.taskflow}"
+            .. " -I%{IncludeDir.magic_enum}"
+        ) 
+    }
+
     files {
 
         "Private/**.cpp",

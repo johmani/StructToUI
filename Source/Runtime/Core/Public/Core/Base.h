@@ -226,3 +226,40 @@
 #   define STATIC_SHADER_SPIRV(NAME) Core::Buffer()
 #endif
 #define STATIC_SHADER(NAME) RHI::StaticShader{ STATIC_SHADER_D3D11(NAME), STATIC_SHADER_D3D12(NAME), STATIC_SHADER_SPIRV(NAME) }
+
+//////////////////////////////////////////////////////////////////////////
+// Meta
+//////////////////////////////////////////////////////////////////////////
+
+#ifdef  META
+#   define TYPE(...)   __attribute__((annotate("TYPE____ "#__VA_ARGS__)))
+#   define PROPERTY(...) __attribute__((annotate("PROPERTY "#__VA_ARGS__)))
+#else 
+#   define TYPE(...)
+#   define PROPERTY(...)
+#endif
+
+#define MetaHeader(nameSpace)                                                                                                            \
+namespace Meta::nameSpace{                                                                                                               \
+                                                                                                                                         \
+    const Meta::TypeRegistry& Registry();                                                                                                \
+                                                                                                                                         \
+    template<typename T>                                                                                                                 \
+    inline Meta::Type* Type()                                                                                                            \
+    {                                                                                                                                    \
+        auto str = std::string_view(typeid(T).name());                                                                                   \
+                                                                                                                                         \
+        if (str.substr(0, 6) == "class ") str = str.substr(6);                                                                           \
+        else if (str.substr(0, 7) == "struct ") str = str.substr(7);                                                                     \
+                                                                                                                                         \
+        const auto& reg = Registry();                                                                                                    \
+        auto type = reg.GetType(str);                                                                                                    \
+                                                                                                                                         \
+        if (type)                                                                                                                        \
+            return reg.GetType(str);                                                                                                     \
+                                                                                                                                         \
+        return nullptr;                                                                                                                  \
+    }                                                                                                                                    \
+                                                                                                                                         \
+    inline Meta::Type* Type(const std::string_view& name) { return Registry().GetType(name); }                                           \
+}

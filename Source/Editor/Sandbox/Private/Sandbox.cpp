@@ -1,14 +1,70 @@
-#include "Core/Core.h"
+#include "Sandbox.h"
+#include "ImExtensions/ImExtra.h"
 #include "Core/EntryPoint.h"
+
+namespace ImGui {
+
+    template<typename T>
+    void Struct(T& type)
+    {
+        Meta::Type* metaType = Meta::Sandbox::Type<T>();
+
+        if (!metaType)
+            return;
+
+        if (ImField::BeginBlock(metaType->name.data()))
+        {
+            if (ImGui::BeginTable(metaType->name.data(), 2))
+            {
+                for (const Meta::Field& field : metaType->Fields())
+                {
+                    if (field.typeName == "float")
+                    {
+                        auto& v = field.Value<float>(type);
+                        ImField::DragFloat(field.name.data(), &v, 0.01f);
+                    }
+                    else if (field.typeName == "Math::float2")
+                    {
+                        auto& v = field.Value<Math::float2>(type);
+                        ImField::DragFloat2(field.name.data(), &v.x, 0.01f);
+                    }
+                    else if (field.typeName == "Math::float3")
+                    {
+                        auto& v = field.Value<Math::float3>(type);
+                        ImField::DragFloat3(field.name.data(), &v.x, 0.01f);
+                    }
+                    else if (field.typeName == "bool")
+                    {
+                        auto& v = field.Value<bool>(type);
+                        ImField::Checkbox(field.name.data(), &v);
+                    }
+                }
+
+                ImGui::EndTable();
+            }
+        }
+        ImField::EndBlock();
+    }
+}
 
 struct AppLayer : Core::Layer
 {
     nvrhi::DeviceHandle device;
     nvrhi::CommandListHandle commandList;
 
+    Sandbox::Entity entity;
+    Sandbox::Camera camera;
+
     void OnUpdate(const Core::FrameInfo& info) override
     {
-       
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
+
+        ImGui::Begin("Auto UI");
+
+        ImGui::Struct(entity);
+        ImGui::Struct(camera);
+
+        ImGui::End();
     }
 
     void OnAttach() override

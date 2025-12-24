@@ -1536,3 +1536,67 @@ namespace Application {
     CORE_API ApplicationContext& GetAppContext();
     ApplicationContext* CreateApplication(ApplicationCommandLineArgs args);
 }
+
+//////////////////////////////////////////////////////////////////////////
+// Meta
+//////////////////////////////////////////////////////////////////////////
+
+namespace Meta {
+
+    struct Field
+    {
+        std::string_view typeName;
+        std::string_view name;
+        size_t size = 0;
+        size_t offset = 0;
+
+        template<typename ReturnType, typename Type>
+        inline ReturnType& Value(Type& type) const 
+        { 
+            uint8_t* buffer = (uint8_t*)(&type) + offset;
+            return *(ReturnType*)(buffer);
+        }
+    };
+
+    struct Type
+    {
+        std::string_view typeName;
+        std::string_view name;
+        size_t size;
+        uint32_t fieldOffset;
+        uint8_t fieldCount;
+        Field* fields = nullptr;
+
+        inline const std::span<Field> Fields() const
+        { 
+            Field* ptr = fields + fieldOffset;
+            return std::span<Field>(ptr, fieldCount);
+        }
+    };
+
+    struct TypeRegistry
+    {
+        Type* types;
+        uint32_t typeCount = 0;
+
+        Field* fields;
+        uint32_t fieldCount = 0;
+
+        inline Type* GetType(const std::string_view& typeName) const
+        {
+            for (uint32_t i = 0; i < typeCount; i++)
+                if (typeName == types[i].typeName)
+                    return &types[i];
+
+            return nullptr;
+        }
+
+        inline Type* GetType(size_t index) const
+        {
+            if (index >= 0 && index < typeCount)
+                return &types[index];
+
+            return nullptr;
+        }
+    };
+}

@@ -224,6 +224,6 @@ function Link.Runtime.Core(extra)
         "%{IncludeDir.Vulkan_Headers}",
     }
 
-    dependson { "ShaderMake"}
+    dependson { "ShaderMake", "Meta" }
 end
 
