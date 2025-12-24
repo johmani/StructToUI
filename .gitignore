@@ -1,0 +1,11 @@
+﻿.vs
+Build
+*.log
+*.sln
+*.vcxproj
+*.filters
+*.user
+imgui.ini
+ThirdParty/Lib
+Source/Editor/Editor/Private/Embeded/dxil
+Source/Editor/Editor/Private/Embeded/spirv
