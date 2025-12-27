@@ -1604,10 +1604,24 @@ namespace Meta {
         inline constexpr Attribute(UI pUi) : type(Type::UI), ui(pUi) {}
     };
 
+    enum class FieldType
+    {
+        None = 0,
+        
+        Float, Float2, Float3, Float4,
+        UInt , UInt2 , UInt3 , UInt4 ,
+        Int  , Int2  , Int3  , Int4  ,
+        Bool , Bool2 , Bool3 , Bool4 ,
+
+        Uint8, Uint16, Uint64,
+        Int8 , Int16 , Int64
+    };
+
     struct Field
     {
         std::string_view typeName;
         std::string_view name;
+        FieldType type;
         size_t size = 0;
         size_t offset = 0;
         uint32_t attributesOffset;

@@ -15,11 +15,11 @@ static Meta::Attribute s_Attributes[] = {
 
 static Meta::Field s_Fields[] = { 
 
-    { "Math::float3", "position", 12, 0, 1, 1, s_Attributes },
-    { "float", "speed", 4, 12, 2, 2, s_Attributes },
-    { "bool", "enabled", 1, 16, 4, 1, s_Attributes },
-    { "float", "fov", 4, 0, 0, 1, s_Attributes },
-    { "bool", "isMain", 1, 4, 0, 1, s_Attributes } 
+    { "Math::float3", "position", Meta::FieldType::Float3, 12, 0, 1, 1, s_Attributes },
+    { "float", "speed", Meta::FieldType::Float, 4, 12, 2, 2, s_Attributes },
+    { "bool", "enabled", Meta::FieldType::Bool, 1, 16, 4, 1, s_Attributes },
+    { "float", "fov", Meta::FieldType::Float, 4, 0, 0, 1, s_Attributes },
+    { "bool", "isMain", Meta::FieldType::Bool, 1, 4, 0, 1, s_Attributes } 
 };
 	
 static Meta::Type s_Types[] = {

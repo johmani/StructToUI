@@ -53,7 +53,9 @@ namespace ImGui {
                         ImGui::PushStyleColor(ImGuiCol_FrameBgActive,  { color.r * 0.8f, color.g * 0.8f, color.b * 0.8f, color.a });
                     }
 
-                    if (field.typeName == "float")
+                    switch (field.type)
+                    {
+                    case Meta::FieldType::Float:
                     {
                         auto& v = field.Value<float>(type);
 
@@ -69,8 +71,10 @@ namespace ImGui {
                         {
                             ImField::DragFloat(field.name.data(), &v, 0.01f, range.fmin, range.fmax);
                         }
+
+                        break;
                     }
-                    else if (field.typeName == "Math::float2")
+                    case Meta::FieldType::Float2:
                     {
                         auto& v = field.Value<Math::float2>(type);
 
@@ -86,8 +90,10 @@ namespace ImGui {
                         {
                             ImField::DragFloat2(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
                         }
-                    }
-                    else if (field.typeName == "Math::float3")
+
+                        break;
+                    } 
+                    case Meta::FieldType::Float3:
                     {
                         auto& v = field.Value<Math::float3>(type);
 
@@ -103,8 +109,10 @@ namespace ImGui {
                         {
                             ImField::DragFloat3(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
                         }
-                    }
-                    else if (field.typeName == "Math::float4")
+
+                        break;
+                    } 
+                    case Meta::FieldType::Float4:
                     {
                         auto& v = field.Value<Math::float4>(type);
 
@@ -120,8 +128,10 @@ namespace ImGui {
                         {
                             ImField::DragFloat4(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
                         }
+
+                        break;
                     }
-                    else if (field.typeName == "bool")
+                    case Meta::FieldType::Bool:
                     {
                         auto& v = field.Value<bool>(type);
 
@@ -133,6 +143,9 @@ namespace ImGui {
                         {
                             ImField::Checkbox(field.name.data(), &v);
                         }
+
+                        break;
+                    } 
                     }
 
                     if (hasColor)

@@ -53,7 +53,7 @@ const Meta::TypeRegistry& Meta::NAME_SPACE::Registry()
 )";
 
 	const char* c_TypeText = R"(    { "TYPE_NAME", "NAME", SIZE, FIELD_OFFSET, FIELD_COUNT, s_Fields })";
-	const char* c_FieldText = R"(    { "TYPE_NAME", "NAME", SIZE, OFFSET, ATTRIBUTE_OFFSET, ATTRIBUTE_COUNT, s_Attributes })";
+	const char* c_FieldText = R"(    { "TYPE_NAME", "NAME", FIELD_TYPE, SIZE, OFFSET, ATTRIBUTE_OFFSET, ATTRIBUTE_COUNT, s_Attributes })";
 }
 
 static std::unordered_map<std::filesystem::path, bool> s_Headers;
@@ -268,12 +268,12 @@ void GenerateCppFileMetaData(
 			std::string temp = TempletText::c_FieldText;
 			temp.replace(temp.find("TYPE_NAME"), 9, field.typeName);
 			temp.replace(temp.find("NAME"), 4, field.name);
+			temp.replace(temp.find("FIELD_TYPE"), 10, ToString(field.type));
 			temp.replace(temp.find("SIZE"), 4, std::to_string(field.size));
 			temp.replace(temp.find("OFFSET"), 6, std::to_string(field.offset));
 			//temp.replace(temp.find("TYPE_INDEX"), 10, std::to_string(field.typeIndex));
 			temp.replace(temp.find("ATTRIBUTE_OFFSET"), 16, std::to_string(field.attributesOffset));
 			temp.replace(temp.find("ATTRIBUTE_COUNT"), 15, std::to_string(field.attributesCount));
-			//temp.replace(temp.find("FIELD_TYPE"), 10, ToString(field.type));
 			//temp.replace(temp.find("ACCESS_SPECIFIER"), 16, ToStrinig(field.AccessSpecifier));
 			
 			fieldText += temp;
