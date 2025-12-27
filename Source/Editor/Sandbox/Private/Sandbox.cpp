@@ -7,37 +7,136 @@ namespace ImGui {
     template<typename T>
     void Struct(T& type)
     {
-        Meta::Type* metaType = Meta::Sandbox::Type<T>();
+        const Meta::Type* metaType = Meta::Sandbox::Type<T>();
 
         if (!metaType)
             return;
 
         if (ImField::BeginBlock(metaType->name.data()))
         {
-            if (ImGui::BeginTable(metaType->name.data(), 2))
+            if (ImGui::BeginTable(metaType->name.data(), 2, ImGuiTableFlags_SizingFixedFit))
             {
                 for (const Meta::Field& field : metaType->Fields())
                 {
+                    Meta::Range range;
+
+                    bool hasColor = false;
+                    Meta::Color color;
+
+                    bool hasUI = false;
+                    Meta::UI ui;
+
+                    for (auto a : field.Attributes())
+                    {
+                        if (a.type == Meta::Attribute::Type::Range)
+                        {
+                            range = a.range;
+                        }
+
+                        if (a.type == Meta::Attribute::Type::UI)
+                        {
+                            ui = a.ui;
+                            hasUI = true;
+                        }
+
+                        if (a.type == Meta::Attribute::Type::Color)
+                        {
+                            color = a.color;
+                            hasColor = true;
+                        }
+                    }
+
+                    if (hasColor)
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_FrameBg,        { color.r       , color.g       , color.b       , color.a });
+                        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, { color.r * 0.9f, color.g * 0.9f, color.b * 0.8f, color.a });
+                        ImGui::PushStyleColor(ImGuiCol_FrameBgActive,  { color.r * 0.8f, color.g * 0.8f, color.b * 0.8f, color.a });
+                    }
+
                     if (field.typeName == "float")
                     {
                         auto& v = field.Value<float>(type);
-                        ImField::DragFloat(field.name.data(), &v, 0.01f);
+
+                        if (hasUI && ui == Meta::UI::Slider)
+                        {
+                            ImField::SliderFloat(field.name.data(), &v, range.fmin, range.fmax);
+                        }
+                        else if (hasUI && ui == Meta::UI::Text)
+                        {
+                            ImField::Text(field.name.data(), "%.3f", v);
+                        }
+                        else
+                        {
+                            ImField::DragFloat(field.name.data(), &v, 0.01f, range.fmin, range.fmax);
+                        }
                     }
                     else if (field.typeName == "Math::float2")
                     {
                         auto& v = field.Value<Math::float2>(type);
-                        ImField::DragFloat2(field.name.data(), &v.x, 0.01f);
+
+                        if (hasUI && ui == Meta::UI::Slider)
+                        {
+                            ImField::SliderFloat2(field.name.data(), &v.x, range.fmin, range.fmax);
+                        }
+                        else if (hasUI && ui == Meta::UI::Text)
+                        {
+                            ImField::Text(field.name.data(), "%.3f, %.3f", v.x, v.y);
+                        }
+                        else
+                        {
+                            ImField::DragFloat2(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
+                        }
                     }
                     else if (field.typeName == "Math::float3")
                     {
                         auto& v = field.Value<Math::float3>(type);
-                        ImField::DragFloat3(field.name.data(), &v.x, 0.01f);
+
+                        if (hasUI && ui == Meta::UI::Slider)
+                        {
+                            ImField::SliderFloat3(field.name.data(), &v.x, range.fmin, range.fmax);
+                        }
+                        else if (hasUI && ui == Meta::UI::Text)
+                        {
+                            ImField::Text(field.name.data(), "%.3f, %.3f, %.3f", v.x, v.y, v.z);
+                        }
+                        else
+                        {
+                            ImField::DragFloat3(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
+                        }
+                    }
+                    else if (field.typeName == "Math::float4")
+                    {
+                        auto& v = field.Value<Math::float4>(type);
+
+                        if (hasUI && ui == Meta::UI::Slider)
+                        {
+                            ImField::SliderFloat4(field.name.data(), &v.x, range.fmin, range.fmax);
+                        }
+                        else if (hasUI && ui == Meta::UI::Text)
+                        {
+                            ImField::Text(field.name.data(), "%.3f, %.3f, %.3f, %.3f", v.x, v.y, v.z, v.w);
+                        }
+                        else
+                        {
+                            ImField::DragFloat4(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
+                        }
                     }
                     else if (field.typeName == "bool")
                     {
                         auto& v = field.Value<bool>(type);
-                        ImField::Checkbox(field.name.data(), &v);
+
+                        if (hasUI && ui == Meta::UI::Text)
+                        {
+                            ImField::Text(field.name.data(), "%s", (v ? "true" : "false"));
+                        }
+                        else
+                        {
+                            ImField::Checkbox(field.name.data(), &v);
+                        }
                     }
+
+                    if (hasColor)
+                        ImGui::PopStyleColor(3);
                 }
 
                 ImGui::EndTable();
@@ -130,3 +229,5 @@ Application::ApplicationContext* Application::CreateApplication(ApplicationComma
 
     return ctx;
 }
+
+

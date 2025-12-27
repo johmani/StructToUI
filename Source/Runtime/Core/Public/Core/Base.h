@@ -245,7 +245,7 @@ namespace Meta::nameSpace{                                                      
     const Meta::TypeRegistry& Registry();                                                                                                \
                                                                                                                                          \
     template<typename T>                                                                                                                 \
-    inline Meta::Type* Type()                                                                                                            \
+    inline const Meta::Type* Type()                                                                                                            \
     {                                                                                                                                    \
         auto str = std::string_view(typeid(T).name());                                                                                   \
                                                                                                                                          \
@@ -261,5 +261,5 @@ namespace Meta::nameSpace{                                                      
         return nullptr;                                                                                                                  \
     }                                                                                                                                    \
                                                                                                                                          \
-    inline Meta::Type* Type(const std::string_view& name) { return Registry().GetType(name); }                                           \
+    inline const Meta::Type* Type(const std::string_view& name) { return Registry().GetType(name); }                                           \
 }

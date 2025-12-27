@@ -1543,18 +1543,88 @@ namespace Application {
 
 namespace Meta {
 
+    enum class UI
+    {
+        Drag,
+        Slider,
+        Text,
+    };
+
+    struct Color
+    {
+        float r, g, b, a;
+
+        Color() = default;
+        inline constexpr Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+    };
+
+    struct Range
+    {
+        union
+        {
+            float fmin = 0;
+            int imin;
+            uint32_t umin;
+        };
+
+        union
+        {
+            float fmax = 1;
+            int imax;
+            uint32_t umax;
+        };
+
+        Range() = default;
+        inline constexpr Range(float min, float max) : fmin(min), fmax(max) {}
+        inline constexpr Range(int min, int max) : imin(min), imax(max) {}
+        inline constexpr Range(uint32_t min, uint32_t max) : umin(min), umax(max) {}
+    };
+
+    struct Attribute
+    {
+        enum class Type
+        {
+            Defult,
+            Range,
+            Color,
+            UI,
+
+        } type;
+
+        union
+        {
+            Range range;
+            Color color;
+            UI ui;
+        };
+
+        inline constexpr Attribute() : type(Type::Defult) {}
+        inline constexpr Attribute(const Range& pRange) : type(Type::Range), range(pRange) {}
+        inline constexpr Attribute(const Color& pColor) : type(Type::Color), color(pColor) {}
+        inline constexpr Attribute(UI pUi) : type(Type::UI), ui(pUi) {}
+    };
+
     struct Field
     {
         std::string_view typeName;
         std::string_view name;
         size_t size = 0;
         size_t offset = 0;
+        uint32_t attributesOffset;
+        uint8_t attributesCount;
+        Attribute* attributes = nullptr;
 
         template<typename ReturnType, typename Type>
         inline ReturnType& Value(Type& type) const 
         { 
             uint8_t* buffer = (uint8_t*)(&type) + offset;
             return *(ReturnType*)(buffer);
+        }
+
+        inline const std::span<const Attribute> Attributes() const
+        {
+            Attribute* ptr = attributes + attributesOffset;
+            return std::span<Attribute>(ptr, attributesCount);
         }
     };
 
@@ -1567,7 +1637,7 @@ namespace Meta {
         uint8_t fieldCount;
         Field* fields = nullptr;
 
-        inline const std::span<Field> Fields() const
+        inline const std::span<const Field> Fields() const
         { 
             Field* ptr = fields + fieldOffset;
             return std::span<Field>(ptr, fieldCount);
@@ -1579,10 +1649,13 @@ namespace Meta {
         Type* types;
         uint32_t typeCount = 0;
 
+        Attribute* attributes;
+        uint32_t attributeCount = 0;
+
         Field* fields;
         uint32_t fieldCount = 0;
 
-        inline Type* GetType(const std::string_view& typeName) const
+        inline const Type* GetType(const std::string_view& typeName) const
         {
             for (uint32_t i = 0; i < typeCount; i++)
                 if (typeName == types[i].typeName)
@@ -1591,7 +1664,7 @@ namespace Meta {
             return nullptr;
         }
 
-        inline Type* GetType(size_t index) const
+        inline const Type* GetType(size_t index) const
         {
             if (index >= 0 && index < typeCount)
                 return &types[index];
