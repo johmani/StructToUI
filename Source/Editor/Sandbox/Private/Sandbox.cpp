@@ -2,6 +2,190 @@
 #include "ImExtensions/ImExtra.h"
 #include "Core/EntryPoint.h"
 
+
+namespace Json {
+    
+    struct JsonWriter
+    {
+        std::ofstream file;
+        std::ostringstream out;
+        int count = 0;
+    };
+
+    template<typename T>
+    void WriteType(JsonWriter& writer, T& c)
+    {
+        const Meta::Type* type = Meta::Sandbox::Type<T>();
+
+        auto& out = writer.out;
+
+        if (writer.count)
+            out << ",\n";
+
+        out << "\"" << type->name << "\" : {";
+
+        auto size = type->fieldCount;
+        for (int i = 0; const auto & field : type->Fields())
+        {
+            switch (field.type)
+            {
+            case Meta::FieldType::None:
+                break;
+            case Meta::FieldType::Float:
+            {
+                auto v = field.Value<float>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Float2:
+            {
+                auto v = field.Value<Math::float2>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Float3:
+            {
+                auto v = field.Value<Math::float3>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Float4:
+            {
+                auto v = field.Value<Math::float4>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Uint8:
+            case Meta::FieldType::Uint16:
+            case Meta::FieldType::Uint64:
+            case Meta::FieldType::UInt:
+            {
+                auto v = field.Value<uint64_t>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::UInt2:
+            {
+                auto v = field.Value<Math::uint2>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::UInt3:
+            {
+                auto v = field.Value<Math::uint3>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::UInt4:
+            {
+                auto v = field.Value<Math::uint4>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Int8:
+            case Meta::FieldType::Int16:
+            case Meta::FieldType::Int64:
+            case Meta::FieldType::Int:
+            {
+                auto v = field.Value<int64_t>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Int2:
+            {
+                auto v = field.Value<Math::int2>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Int3:
+            {
+                auto v = field.Value<Math::int3>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Int4:
+            {
+                auto v = field.Value<Math::int4>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Bool:
+            {
+                auto v = field.Value<bool>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Bool2:
+            {
+                auto v = field.Value<Math::bool2>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Bool3:
+            {
+                auto v = field.Value<Math::bool3>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            case Meta::FieldType::Bool4:
+            {
+                auto v = field.Value<Math::bool4>(c);
+                out << "\"" << field.name << "\" : " << v;
+                if (i != (size - 1)) out << ",";
+                break;
+            }
+            default:
+                break;
+            }
+           
+            i++;
+            writer.count++;
+        }
+
+        out << "}";
+    }
+
+    void BeginJson(JsonWriter& writer, const std::filesystem::path& filePath)
+    {
+        writer.file.open(filePath);
+        if (!writer.file.is_open())
+        {
+            LOG_ERROR("Unable to open file for writing, {}", filePath.string());
+            return;
+        }
+
+        writer.out.str({});
+        writer.out.clear();
+
+        writer.out << "{\n";
+    }
+
+    void EndJson(JsonWriter& writer)
+    {
+        if (!writer.file.is_open())
+            return;
+
+        writer.out << "\n}";
+        writer.file << writer.out.str();
+        writer.file.close();
+    }
+}
+
 namespace ImGui {
 
     template<typename T>
@@ -176,6 +360,18 @@ struct AppLayer : Core::Layer
 
         ImGui::Struct(entity);
         ImGui::Struct(camera);
+
+        if (ImGui::Button("Save", { -1, 0 }))
+        {
+            Json::JsonWriter writer;
+            
+            Json::BeginJson(writer, "JsonFile.json");
+
+            Json::WriteType(writer, entity);
+            Json::WriteType(writer, camera);
+
+            Json::EndJson(writer);
+        }
 
         ImGui::End();
     }
