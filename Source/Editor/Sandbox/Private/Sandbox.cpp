@@ -18,30 +18,22 @@ namespace ImGui {
             {
                 for (const Meta::Field& field : metaType->Fields())
                 {
-                    Meta::Range range;
-
-                    bool hasColor = false;
+                    Meta::Range range(-FLT_MAX, FLT_MAX);
+                    Meta::UI ui = Meta::UI::Default;
                     Meta::Color color;
+                    bool hasColor = false;
 
-                    bool hasUI = false;
-                    Meta::UI ui;
-
-                    for (auto a : field.Attributes())
+                    for (const Meta::Attribute& att : field.Attributes())
                     {
-                        if (a.type == Meta::Attribute::Type::Range)
-                        {
-                            range = a.range;
-                        }
+                        if (att.type == Meta::Attribute::Type::Range)
+                            range = att.range;
 
-                        if (a.type == Meta::Attribute::Type::UI)
-                        {
-                            ui = a.ui;
-                            hasUI = true;
-                        }
+                        if (att.type == Meta::Attribute::Type::UI)
+                            ui = att.ui;
 
-                        if (a.type == Meta::Attribute::Type::Color)
+                        if (att.type == Meta::Attribute::Type::Color)
                         {
-                            color = a.color;
+                            color = att.color;
                             hasColor = true;
                         }
                     }
@@ -59,74 +51,78 @@ namespace ImGui {
                     {
                         auto& v = field.Value<float>(type);
 
-                        if (hasUI && ui == Meta::UI::Slider)
+                        switch (ui)
                         {
-                            ImField::SliderFloat(field.name.data(), &v, range.fmin, range.fmax);
-                        }
-                        else if (hasUI && ui == Meta::UI::Text)
-                        {
+                        case Meta::UI::Default:
+                        case Meta::UI::Drag:
+                            ImField::DragFloat(field.name.data(), &v, 0.01f, range.min, range.max);
+                            break;
+                        case Meta::UI::Slider:
+                            ImField::SliderFloat(field.name.data(), &v, range.min, range.max);
+                            break;
+                        case Meta::UI::Text:
                             ImField::Text(field.name.data(), "%.3f", v);
+                            break;
                         }
-                        else
-                        {
-                            ImField::DragFloat(field.name.data(), &v, 0.01f, range.fmin, range.fmax);
-                        }
-
+                       
                         break;
                     }
                     case Meta::FieldType::Float2:
                     {
                         auto& v = field.Value<Math::float2>(type);
 
-                        if (hasUI && ui == Meta::UI::Slider)
+                        switch (ui)
                         {
-                            ImField::SliderFloat2(field.name.data(), &v.x, range.fmin, range.fmax);
-                        }
-                        else if (hasUI && ui == Meta::UI::Text)
-                        {
+                        case Meta::UI::Default:
+                        case Meta::UI::Drag:
+                            ImField::DragFloat2(field.name.data(), &v.x, 0.01f, range.min, range.max);
+                            break;
+                        case Meta::UI::Slider:
+                            ImField::SliderFloat2(field.name.data(), &v.x, range.min, range.max);
+                            break;
+                        case Meta::UI::Text:
                             ImField::Text(field.name.data(), "%.3f, %.3f", v.x, v.y);
-                        }
-                        else
-                        {
-                            ImField::DragFloat2(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
+                            break;
                         }
 
                         break;
-                    } 
+                    }
                     case Meta::FieldType::Float3:
                     {
                         auto& v = field.Value<Math::float3>(type);
 
-                        if (hasUI && ui == Meta::UI::Slider)
+                        switch (ui)
                         {
-                            ImField::SliderFloat3(field.name.data(), &v.x, range.fmin, range.fmax);
-                        }
-                        else if (hasUI && ui == Meta::UI::Text)
-                        {
+                        case Meta::UI::Default:
+                        case Meta::UI::Drag:
+                            ImField::DragFloat3(field.name.data(), &v.x, 0.01f, range.min, range.max);
+                            break;
+                        case Meta::UI::Slider:
+                            ImField::SliderFloat3(field.name.data(), &v.x, range.min, range.max);
+                            break;
+                        case Meta::UI::Text:
                             ImField::Text(field.name.data(), "%.3f, %.3f, %.3f", v.x, v.y, v.z);
-                        }
-                        else
-                        {
-                            ImField::DragFloat3(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
+                            break;
                         }
 
                         break;
-                    } 
+                    }
                     case Meta::FieldType::Float4:
                     {
                         auto& v = field.Value<Math::float4>(type);
 
-                        if (hasUI && ui == Meta::UI::Slider)
+                        switch (ui)
                         {
-                            ImField::SliderFloat4(field.name.data(), &v.x, range.fmin, range.fmax);
-                        }
-                        else if (hasUI && ui == Meta::UI::Text)
-                        {
+                        case Meta::UI::Default:
+                        case Meta::UI::Drag:
+                            ImField::DragFloat4(field.name.data(), &v.x, 0.01f, range.min, range.max);
+                            break;
+                        case Meta::UI::Slider:
+                            ImField::SliderFloat4(field.name.data(), &v.x, range.min, range.max);
+                            break;
+                        case Meta::UI::Text:
                             ImField::Text(field.name.data(), "%.3f, %.3f, %.3f, %.3f", v.x, v.y, v.z, v.w);
-                        }
-                        else
-                        {
-                            ImField::DragFloat4(field.name.data(), &v.x, 0.01f, range.fmin, range.fmax);
+                            break;
                         }
 
                         break;
@@ -135,17 +131,22 @@ namespace ImGui {
                     {
                         auto& v = field.Value<bool>(type);
 
-                        if (hasUI && ui == Meta::UI::Text)
+                        switch (ui)
                         {
+                        case Meta::UI::Default:   
+                            ImField::Checkbox(field.name.data(), &v);
+                            break;
+                        case Meta::UI::Drag:   break;
+                        case Meta::UI::Slider: break;
+                        case Meta::UI::Text:
                             ImField::Text(field.name.data(), "%s", (v ? "true" : "false"));
-                        }
-                        else
-                        {
+                            break;
+                        default :    
                             ImField::Checkbox(field.name.data(), &v);
                         }
 
                         break;
-                    } 
+                    }
                     }
 
                     if (hasColor)

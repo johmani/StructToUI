@@ -1543,8 +1543,9 @@ namespace Application {
 
 namespace Meta {
 
-    enum class UI
+    enum class UI : uint8_t
     {
+        Default,
         Drag,
         Slider,
         Text,
@@ -1560,31 +1561,21 @@ namespace Meta {
 
     struct Range
     {
-        union
-        {
-            float fmin = 0;
-            int imin;
-            uint32_t umin;
-        };
-
-        union
-        {
-            float fmax = 1;
-            int imax;
-            uint32_t umax;
-        };
+        float min = 0;
+        float max = 1;
 
         Range() = default;
-        inline constexpr Range(float min, float max) : fmin(min), fmax(max) {}
-        inline constexpr Range(int min, int max) : imin(min), imax(max) {}
-        inline constexpr Range(uint32_t min, uint32_t max) : umin(min), umax(max) {}
+        inline constexpr Range(float min, float max) 
+            : min(min), max(max) 
+        {
+        }
     };
 
     struct Attribute
     {
         enum class Type
         {
-            Defult,
+            Default,
             Range,
             Color,
             UI,
@@ -1598,7 +1589,7 @@ namespace Meta {
             UI ui;
         };
 
-        inline constexpr Attribute() : type(Type::Defult) {}
+        inline constexpr Attribute() : type(Type::Default) {}
         inline constexpr Attribute(const Range& pRange) : type(Type::Range), range(pRange) {}
         inline constexpr Attribute(const Color& pColor) : type(Type::Color), color(pColor) {}
         inline constexpr Attribute(UI pUi) : type(Type::UI), ui(pUi) {}
