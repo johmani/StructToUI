@@ -407,7 +407,7 @@ Application::ApplicationContext* Application::CreateApplication(ApplicationComma
     Application::ApplicationDesc desc;
     desc.commandLineArgs = args;
 
-#ifdef HE_DIST
+#ifdef CORE_DIST
     if (args.count == 2)
         desc.workingDirectory = std::filesystem::path(args[0]).parent_path();
 #endif

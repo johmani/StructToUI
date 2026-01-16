@@ -43,6 +43,7 @@ project "Core"
         "%{IncludeDir.simdjson}",
         "%{IncludeDir.nvrhi}",
         "%{IncludeDir.Vulkan_Headers}",
+        "%{IncludeDir.DirectX_Headers}/directx",
         "%{IncludeDir.ShaderMake}",
         "%{IncludeDir.miniz}",
         "%{IncludeDir.magic_enum}",
