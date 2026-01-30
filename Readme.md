@@ -19,5 +19,5 @@ Once the setup is complete, open the generated solution in Visual Studio and bui
 
 ## Video
 
-You can watch a video about the project [How to Generate UI from Structs Using Reflection](https://youtu.be/Qz0KTGYJtUk).
+You can watch a video about the project [How to Generate UI from Structs Using Reflection](https://youtu.be/COcLh4eohsY).
 [![How to Generate UI from Structs Using Reflection](https://raw.githubusercontent.com/johmani/Images/master/StructToUI.png)](https://youtu.be/COcLh4eohsY)
